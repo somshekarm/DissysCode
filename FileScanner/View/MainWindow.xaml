@@ -11,6 +11,6 @@
             <DataGrid ItemsSource="{Binding Customers}" GridLinesVisibility="Vertical" VerticalScrollBarVisibility="Auto" HeadersVisibility="Column" ScrollViewer.ScrollChanged="OnScrollChange">
             </DataGrid>
         </Grid>
-        <Button Command="{Binding ClickCommand}" Width="292" Height="35" >Browse Folder</Button>
+        <Button Command="{Binding SelectFolderCommand}" Width="292" Height="35" >Browse Folder</Button>
     </StackPanel>    
 </Window>

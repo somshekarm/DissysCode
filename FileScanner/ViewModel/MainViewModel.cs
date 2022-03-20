@@ -15,17 +15,16 @@ namespace FileScanner.ViewModel
     {
         private ObservableCollection<Customer> _customers;
         private List<Customer> _customerList;
-        private List<FileInfo> fileInfos = new List<FileInfo>();
+        private List<FileInfo> fileInfos = new List<FileInfo>();        
+        private ICommand _selectFolderCommand;
         private int currentCount = 0;
-        private ICommand _clickCommand;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ICommand ClickCommand
+        public ICommand SelectFolderCommand
         {
             get
             {
-                return _clickCommand ?? (_clickCommand = new CommandHandler(() => SelectFolder(), () => CanExecute));
+                return _selectFolderCommand ?? (_selectFolderCommand = new CommandHandler(() => SelectFolder(), () => CanExecute));
             }
         }
         public bool CanExecute
@@ -50,9 +49,10 @@ namespace FileScanner.ViewModel
                 _customers = value;                
                 OnPropertyChanged("Customers");
                 
-            }
-                
+            }                
         }
+
+        public bool EndOfFile { get; private set; }
 
         public MainViewModel()
         {
@@ -72,6 +72,11 @@ namespace FileScanner.ViewModel
             dialog.UseDescriptionForTitle = true;   
             if ((bool)dialog.ShowDialog())
             {
+                _customers.Clear();
+                _customerList.Clear();
+                currentCount = 0;
+                EndOfFile = false;
+                Customers = new ObservableCollection<Customer>(_customerList);
                 var path = dialog.SelectedPath;
                 var dirInfo = new DirectoryInfo(path);
                 fileInfos = dirInfo.GetFiles("*.txt", SearchOption.AllDirectories).ToList();
@@ -83,12 +88,16 @@ namespace FileScanner.ViewModel
         {            
             var listToprocess = fileInfos.Skip(currentCount).Take(100);
             currentCount += listToprocess.Count();
+            if(listToprocess.Count() == 0)
+            {
+                EndOfFile = true;
+            }
 
             foreach (var file in listToprocess)
             {
                 var customersFound = await GetFileText(file.FullName);
                 if (customersFound.Count() > 0)
-                {
+                {                    
                     _customerList.AddRange(customersFound);
                     Customers = new ObservableCollection<Customer>(_customerList);
                 }

@@ -1,19 +1,7 @@
 ﻿using FileScanner.ViewModel;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FileScanner
 {
@@ -30,19 +18,24 @@ namespace FileScanner
 
         private void OnScrollChange(object sender, ScrollChangedEventArgs e)
         {
-            ScrollViewer sb = e.OriginalSource as ScrollViewer;
-            if(sb.VerticalOffset == 0)
+            ScrollViewer sb = e.OriginalSource as ScrollViewer;               
+            
+            if (sb.VerticalOffset == 0)
             {
                 return;
-            }
-
-            if (sb.VerticalOffset == sb.ScrollableHeight)
-            {
+            }            
+            else if (sb.VerticalOffset == sb.ScrollableHeight)
+            {   
                 var vm = ((MainViewModel)DataContext);
+                if (vm.EndOfFile)
+                {
+                    MessageBox.Show("No more Customer to display");
+                    return;
+                }
                 var count = vm.Customers.Count();
                 _ = vm.LoadMoreData();
-                sb.ScrollToVerticalOffset(count - 100);                                
-            }
+                sb.ScrollToVerticalOffset(count - 100);
+            }           
         }
     }
 }
